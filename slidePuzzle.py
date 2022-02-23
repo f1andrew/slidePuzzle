@@ -1,3 +1,4 @@
+from shutil import move
 import wx
 import random
 
@@ -89,10 +90,26 @@ class MainFrame(wx.Frame):
                 self.victory_routine()
 
     def shuffleTiles(self, n_moves):
+        possible_moves = [-1, 1]
         for i in range(n_moves):
-            rand_x = random.randrange(self.cols)
-            rand_y = random.randrange(self.cols)
-            self.moveTile(rand_x, rand_y, True)
+            move_tile_x = self.blank_tile_x
+            move_tile_y = self.blank_tile_y
+            if random.randrange(2) == 0:                
+                if move_tile_x == 0:
+                    move_tile_x += 1
+                elif move_tile_x == self.cols -1:
+                    move_tile_x -= 1
+                else:
+                    move_tile_x += possible_moves[random.randrange(2)]                
+            else:
+                if move_tile_y == 0:
+                    move_tile_y += 1
+                elif move_tile_y == self.rows -1:
+                    move_tile_y -= 1
+                else:
+                    move_tile_y += possible_moves[random.randrange(2)]                
+            
+            self.moveTile(move_tile_x, move_tile_y, True)
 
     def check_is_won(self):
         tile_counter = 0
