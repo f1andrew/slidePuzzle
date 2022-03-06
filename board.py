@@ -11,33 +11,28 @@ class Board(wx.Panel):
         self.rows = 3
         self.tile_width = self.puzzle_width // self.cols
         self.tile_height = self.puzzle_height // self.rows
-        self.tiles = []
-        self.tile_indexes = []
+        self.tiles = None
+        self.tile_indexes = None
         self.removed_tile = None
-        self.game_state = True
-
-        self.source_image = wx.Image("nasa_logo.jpg", type=wx.BITMAP_TYPE_ANY, index=-1)        
-        self.source_image.Rescale(self.puzzle_width, self.puzzle_height, wx.IMAGE_QUALITY_HIGH)
-        self.splitImage(self.source_image)
-        self.shuffleTiles(5)
+        self.game_state = False
 
         self.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.Bind(wx.EVT_LEFT_UP, self.mousePress)
+        self.Bind(wx.EVT_LEFT_UP, self.mousePress)    
 
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
         dc.SetPen(wx.Pen('#000000', 3, wx.PENSTYLE_SOLID))
         dc.SetBrush(wx.Brush('#4c4c4c', wx.BRUSHSTYLE_TRANSPARENT))
-
-        for y in range(self.rows):
-            for x in range(self.cols):
-                x_offset = x*self.tile_width
-                y_offset = y*self.tile_height
-                if self.tile_indexes[y][x] != None:
-                    tile_index = self.tile_indexes[y][x]
-                    dc.DrawBitmap(wx.Bitmap(self.tiles[tile_index], wx.BITMAP_TYPE_ANY), x=x_offset, y=y_offset)
-                if self.game_state:
-                    dc.DrawRectangle(x_offset, y_offset, self.tile_width, self.tile_height)
+        if self.tile_indexes !=None:
+            for y in range(self.rows):
+                for x in range(self.cols):
+                    x_offset = x*self.tile_width
+                    y_offset = y*self.tile_height
+                    if self.tile_indexes[y][x] != None:
+                        tile_index = self.tile_indexes[y][x]
+                        dc.DrawBitmap(wx.Bitmap(self.tiles[tile_index], wx.BITMAP_TYPE_ANY), x=x_offset, y=y_offset)
+                    if self.game_state:
+                        dc.DrawRectangle(x_offset, y_offset, self.tile_width, self.tile_height)
 
     def mousePress(self, event): 
         if self.game_state:       
@@ -50,12 +45,21 @@ class Board(wx.Panel):
                     self.parent.update_game_state()
         event.Skip()
 
+    def start_game(self):        
+        self.source_image = wx.Image("nasa_logo.jpg", type=wx.BITMAP_TYPE_ANY, index=-1)
+        self.source_image.Rescale(self.puzzle_width, self.puzzle_height, wx.IMAGE_QUALITY_HIGH)
+        self.splitImage(self.source_image)
+        self.shuffleTiles(5)
+        self.game_state = True
+        self.Refresh()
+
     def stop_game(self):        
         self.tile_indexes[self.rows-1][self.cols-1] = self.rows*self.cols-1
         self.game_state = False
 
     def splitImage(self, original_image):
         self.tiles = []
+        self.tile_indexes = []
         tile_counter = 0
         for y in range(self.rows):            
             row_tmp = []

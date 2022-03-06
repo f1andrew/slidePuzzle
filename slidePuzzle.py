@@ -7,20 +7,34 @@ class MainFrame(wx.Frame):
         mainPanel = wx.Panel(self)
         self.moveCounter = 0        
         self.gameTime = 0
-        self.board = Board(self, (400,400), (20,50))
+        self.board = Board(self, (400,400), (20,100))
 
         font = wx.Font((0,25), wx.FONTFAMILY_SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD)
 
-        self.moveLabel = wx.StaticText(self, label="Moves: 0", pos=(20,10), size=(150,25), style=0)        
+        self.moveLabel = wx.StaticText(self, label="Moves: 0", pos=(20,60), size=(150,25), style=0)        
         self.moveLabel.SetFont(font)
 
-        self.timeLabel = wx.StaticText(self, label="Time: 00:00", pos=(270,10), size=(150,25), style=wx.ALIGN_RIGHT)        
+        self.timeLabel = wx.StaticText(self, label="Time: 00:00", pos=(270,60), size=(150,25), style=wx.ALIGN_RIGHT)        
         self.timeLabel.SetFont(font)
 
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.update_time, self.timer)
-        self.timer.Start(1000)
+
+        restartButton = wx.Button(self, label="Restart game", pos=(320,10), size=(100,35), style=0)
+        restartButton.Bind(wx.EVT_BUTTON, self.start_game)
+
+        self.start_game()
     
+    def start_game(self, e=None):        
+        self.moveCounter = 0        
+        self.gameTime = 0
+        self.board.start_game()
+        self.timer.Start(1000)        
+        
+        self.moveLabel.SetLabel("Moves: 0")
+        self.timeLabel.SetLabel("Time: 00:00")
+        
+
     def update_game_state(self):
         self.moveCounter += 1
         self.moveLabel.SetLabel("Moves: {}".format(self.moveCounter))
@@ -45,6 +59,6 @@ class MainFrame(wx.Frame):
 
 if __name__ == '__main__':
     app = wx.App()
-    frame = MainFrame(None, title='Slide Puzzle', size=(500,500))
+    frame = MainFrame(None, title='Slide Puzzle', size=(500,550))
     frame.Show()
     app.MainLoop()
